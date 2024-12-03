@@ -1,9 +1,7 @@
-import dotenv from 'dotenv';
 import Elysia from 'elysia';
-import { HttpLogger, Logger } from './helper';
+import { HttpLogger, Logger, serverless } from './helper';
 import { indexRoutes } from './routes';
 
-dotenv.config();
 
 const app = new Elysia();
 const port = 8000;
@@ -15,16 +13,8 @@ app.use(HttpLogger);
 app.use(indexRoutes);
 
 // Starting the server
-app.listen(port, async () => {
-    try {
-        Logger.info(`[Elysia-Service] Server is running on port ${port}`);
-    } catch (error) {
-        if (error instanceof Error) {
-            Logger.error(
-                `Error starting server: Message: ${error.message} | Stack: ${error.stack}`
-            );
-        } else {
-            Logger.error(`Error starting server: ${String(error)}`);
-        }
-    }
+const server = serverless(app);
+
+server.listen(port, () => {
+  Logger.info(`[Elysia-Service] Server is running on port ${port}`);
 });
